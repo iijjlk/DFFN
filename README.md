@@ -2,14 +2,23 @@
 
 Official PyTorch implementation of **DFFN**.
 <p align="center">
-  <img src="src/fig1.png" width=80%> <br>
+  <img src="src/fig1.png" > <br>
   Fig. 1. Comparison between the latest state-of-the-art methods and our approach.
 </p>
 
+## 📑 Content
+- [TODO](#todo)
+- [Dataset](#data_set)
+- [Visual Results](#visual)
 
+## <a name='todo'></a>☑️ TODO
+- [x] Build the repo
+- [ ] arXiv version
+- [ ] Release code
+- [ ] Pretrained weights&log_files
+- [ ] Add Download Link for Visual Results on Common Benckmarks
 
-## Dataset
-
+## <a name='data_set'></a>🔍Dataset
 We proposed two datasets iSAID-dark and darkrs. Please click [this link](null) for detailed preparation description. (Coming soon.)
 <p align="center">
   <img src="src/fig5.jpg" width=80%> <br>
@@ -21,7 +30,7 @@ We proposed two datasets iSAID-dark and darkrs. Please click [this link](null) f
 ###  Coming Soon....
 
 
-## Results
+## <a name='visual'></a>🔍Visual Results 
 
 <p align="center">
   <img src="src/result_ISAIDdark.png" width=80%> <br>

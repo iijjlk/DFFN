@@ -4,9 +4,9 @@ import torch.nn.functional as F
 import numpy as np
 
 
-# 并行并加入sigmoid
+
 def make_model(args, parent=False):
-    return MITNet(in_chn=3, wf=10, depth=4)
+    return DDFN(in_chn=3, wf=10, depth=4)
 
 
 class Down(nn.Module):
@@ -86,10 +86,10 @@ class Context(nn.Module):
         return out
 
 
-# Adaptive Dynamic Filter Block
-class AFG(nn.Module):
+#
+class IFM(nn.Module):
     def __init__(self, in_channels=24, kernel_size=3):
-        super(AFG, self).__init__()
+        super(IFM, self).__init__()
         self.kernel_size = kernel_size
         self.sekg = Context(in_channels, kernel_size)
         self.fusion = nn.Conv2d(in_channels * 3, in_channels, 1, 1, 0)
@@ -109,10 +109,10 @@ class AFG(nn.Module):
         return out + x
 
 
-# Triple Interaction
-class FCI(nn.Module):
+
+class IFAM(nn.Module):
     def __init__(self, wf=24, depth=4):
-        super(FCI, self).__init__()
+        super(IFAM, self).__init__()
         self.depth = depth
         self.wf = wf
         self.conv_amp = nn.ModuleList()
@@ -175,9 +175,9 @@ class FCI(nn.Module):
         return pha_feas, amp_feas
 
 
-class MITNet(nn.Module):
+class DDFN(nn.Module):
     def __init__(self, in_chn=3, wf=20, depth=4, relu_slope=0.2):
-        super(MITNet, self).__init__()
+        super(DDFN, self).__init__()
         self.depth = depth
         self.down_path_1 = nn.ModuleList()
         self.down_path_2 = nn.ModuleList()
@@ -209,13 +209,13 @@ class MITNet(nn.Module):
 
         self.sam12 = SAM(prev_channels)
         self.cat12 = nn.Conv2d(prev_channels * 2, prev_channels, 1, 1, 0)
-        self.fci = FCI(wf, depth)
+        self.fci = IFAM(wf, depth)
 
         self.last = nn.Conv2d(prev_channels, in_chn, 3, 1, 1, bias=True)
 
     def forward(self, x):
         image = x
-        # stage 1 : amplitude rain removal stage
+        # stage 1 : amplitude  stage
         x1 = self.conv_01(image)
         encs = []
         decs = []
@@ -231,7 +231,7 @@ class MITNet(nn.Module):
             decs.append(x1)
         sam_feature, out_1 = self.sam12(x1, image)
 
-        # stage 2 : phase structure refinement stage
+        # stage 2 : phase  stage
         # ============================================================================================
         # ============================================================================================
         out_1_fft = torch.fft.rfft2(out_1, norm='backward')
@@ -370,7 +370,7 @@ class UNetUpBlockStage2(nn.Module):
         self.up = nn.ConvTranspose2d(in_size, out_size, kernel_size=2, stride=2, bias=True)
         self.conv_block = FFTConvBlock(in_size, out_size, False, relu_slope, use_FFT_AMP, use_FFT_PHASE)
 
-        self.afg = (AFG(out_size, 3))
+        self.afg = (IFM(out_size, 3))
 
     def forward(self, x, pha, amp):
         up = self.up(x)
@@ -400,15 +400,14 @@ import cv2
 import numpy as np
 
 def build():
-    model = MITNet(in_chn=3, wf=20, depth=4)
+    model = DDFN(in_chn=3, wf=20, depth=4)
     return model
 if __name__ == "__main__":
-    model = MITNet(in_chn=3, wf=30, depth=4).cuda()
+    model = DDFN(in_chn=3, wf=30, depth=4).cuda()
 
     # img = cv2.imread("butterfly.bmp", cv2.IMREAD_UNCHANGED)
     # img = np.float32(img/255.)
     # x  = torch.from_numpy(np.ascontiguousarray(img)).permute(2, 0, 1).float().unsqueeze(0)
-    # x = cv2.imread('../../experiment/test_results/M3ITNet/1.png')
     # if x.shape[0] % 16 != 0 or x.shape[1] % 16 != 0:
     #     i = x.shape[0]
     #     j = x.shape[1]

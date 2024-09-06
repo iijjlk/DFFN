@@ -2,7 +2,7 @@ import torch
 import torchvision
 import torch.optim
 
-from model.mitnet import MITNet
+from model.DDFN import MITNet
 import numpy as np
 import torch.nn as nn
 from PIL import Image
